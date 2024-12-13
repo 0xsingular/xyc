@@ -1,29 +1,22 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const WebSocket = require("ws");
 
 const app = express();
-app.use(bodyParser.json());
-app.use(express.static("public"));
+app.use(bodyParser.json()); // Parse incoming JSON requests
 
-const wss = new WebSocket.Server({ port: 3000 });
 let commitCount = 0;
 
-function broadcast(data) {
-    wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(data);
-        }
-    });
-}
-
+// Define the /webhook endpoint
 app.post("/webhook", (req, res) => {
     if (req.body.commits && req.body.commits.length > 0) {
         commitCount += req.body.commits.length;
-        console.log(`New commits: ${req.body.commits.length}. Total: ${commitCount}`);
-        broadcast(commitCount.toString());
+        console.log(`New commits pushed. Total commit count: ${commitCount}`);
     }
-    res.status(200).send("Webhook received");
+    res.status(200).send("Webhook received successfully!"); // Respond to GitHub
 });
 
-app.listen(3001, () => console.log("Server running on port 3001"));
+// Start the server
+const PORT = 3001;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});

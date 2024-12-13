@@ -1,32 +1,22 @@
-const canvas = document.getElementById("commitCanvas");
-const ctx = canvas.getContext("2d");
-const commitCounter = document.getElementById("commitCounter");
+const express = require("express");
+const bodyParser = require("body-parser");
 
-function drawDot(x, y, color) {
-    ctx.beginPath();
-    ctx.arc(x, y, 5, 0, Math.PI * 2); // Circle with radius 5
-    ctx.fillStyle = color;
-    ctx.fill();
-}
-
-function generateDots(commitCount) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-    for (let i = 0; i < commitCount; i++) {
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
-        drawDot(x, y, color);
-    }
-}
+const app = express();
+app.use(bodyParser.json()); // Parse incoming JSON requests
 
 let commitCount = 0;
-const socket = new WebSocket("ws://localhost:3000");
 
-socket.onmessage = (event) => {
-    commitCount = parseInt(event.data);
-    commitCounter.innerText = commitCount;
-    generateDots(commitCount);
-};
+// Define the /webhook endpoint
+app.post("/webhook", (req, res) => {
+    if (req.body.commits && req.body.commits.length > 0) {
+        commitCount += req.body.commits.length;
+        console.log(`New commits pushed. Total commit count: ${commitCount}`);
+    }
+    res.status(200).send("Webhook received successfully!"); // Respond to GitHub
+});
 
-socket.onopen = () => console.log("Connected to WebSocket");
-socket.onerror = (error) => console.error("WebSocket Error:", error);
+// Start the server
+const PORT = 3001;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
