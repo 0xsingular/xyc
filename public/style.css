@@ -1,0 +1,25 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+#tracker {
+    margin: 20px auto;
+    padding: 10px;
+    max-width: 1020px;
+}
+
+#tracker p {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+canvas {
+    margin-top: 10px;
+    border: 2px solid #0078d7;
+    border-radius: 8px;
+    background-color: white;
+}
